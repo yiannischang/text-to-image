@@ -1,0 +1,59 @@
+	#attributes{
+		background-color:#FBFFCF;
+		padding:0.5em 1em;
+		margin-right:1em
+	}
+	#attributes label{
+		margin-right: 1em;
+		white-space: nowrap;
+	}
+	#canvas{
+		/*margin-top:0.5em;*/
+		width:480px;
+		overflow:visible
+	}
+	#actions{
+		margin-bottom:0.5em
+	}
+	#w{
+		width:398px;
+		min-height:200px;
+		padding:10px;
+		font-family:Georgia;
+		font-size:16px;
+		line-height:24px;
+		background-color:#ffffff;
+		color:#000000
+	}
+	#s{
+		width:615px;
+		height:300px;
+		display:none
+	}
+	input{
+		padding:1px 6px
+	}
+	#convert{
+		background-color:#057cb5;
+		color:#ffffff;
+		border:none;
+		line-height:1.5em;
+		-moz-border-radius:4px;
+		-webkit-border-radius:4px;
+		-khtml-border-radius:4px;
+		border-radius:4px
+	}
+	#convert:hover{
+		background-color:#04628e
+	}
+	#unsupported{
+		border:1px solid gray;
+		background-color:silver;
+		padding:5px
+	}
+	#unsupported p{
+		text-align:center
+	}
+	#output,#unsupported{
+		display:none
+	}

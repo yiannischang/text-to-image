@@ -3,10 +3,11 @@
   <head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <!--link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'-->
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <link rel="stylesheet" type="text/css" href="stylesheets/main.css" media="screen">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -22,46 +23,34 @@
           <h2></h2>
         </header>
 
-        <section id="downloads" class="clearfix">
+        <!--section id="downloads" class="clearfix">
           <a href="https://github.com/yiannischang/text-to-image/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
           <a href="https://github.com/yiannischang/text-to-image/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
           <a href="https://github.com/yiannischang/text-to-image" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
+        </section-->
 
         <hr>
 
+        <section id='text-to-image'>
+
+        <div id='canvas'>
+          <div id='w' contenteditable="true" onclick="init();return false;">请在此输入文字</div>
+          <div id='gen-image'></div>
+        </div>
+
+        <input type="button" id="convert" value="生成图片" onclick="getimage();return false;"> 
+        <div id="share-wb"></div>
+
+
+        </section>
+        <hr>
         <section id="main_content">
-          <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+          <h3>使用方法
+          </h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
-
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
-
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
-
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
-
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>
+在上面文本框中输入你想转换的文字，点击“生成图片”按钮，文字区域会转换成图片，鼠标右键点击，保存图片。重新编辑文字，点击“编辑文字”按钮。
+</p>
         </section>
 
         <footer>
@@ -73,4 +62,68 @@ $ git checkout gh-pages
       </div>
     </div>
   </body>
+
+    <script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+    <script src="./javascripts/html2canvas.js"></script>
+
+
+  <script>
+  function init() {
+  }
+
+  function getimage() {
+
+    var elem = $('#w');
+
+    if( $('#convert').val() === '生成图片'  ) {
+    html2canvas($('#w').get(0), {
+      onrendered: function(canvas) {
+        $('#w').hide();
+        $('#gen-image').append(canvas);
+        $('#convert').val('修改文字');
+
+        // save to image
+        var d = canvas.toDataURL("image/png");
+        console.log(d);
+        },
+      //width: 300,
+      //height: 300
+    });
+   }
+    else{
+
+        $('#gen-image').empty();
+        $('#w').show();
+        $('#convert').val('生成图片');
+
+    }
+  }
+
+  $( function  (){
+
+   var _w = 16 , _h = 16;
+   var param = {
+url:location.href,
+    type:'3',
+    count:'', /**是否显示分享数，1显示(可选)*/
+    appkey:'', /**您申请的应用appkey,显示分享来源(可选)*/
+    title:'aa', /**分享的文字内容(可选，默认为所在页面的title)*/
+    pic: 'images/download.png',
+    //pic: "{{ site.production_url }}" + "/assets/images/1.png", /**分享图片的路径(可选)  screencapture needed ?? maybe? */
+    ralateUid:'2141239811', /**关联用户的UID，分享微博会@该用户(可选)  That's me: @reduci */
+    language:'zh_cn', /**设置语言，zh_cn|zh_tw(可选)*/
+    rnd:new Date().valueOf()
+   }
+   var temp = [];
+   for( var p in param ){
+     temp.push(p + '=' + encodeURIComponent( param[p] || '' ) )
+   }
+   $('#share-wb').append('<iframe allowTransparency="true" frameborder="0" scrolling="no" src="http://hits.sinajs.cn/A1/weiboshare.html?' + temp.join('&') + '" width="'+ _w+'" height="'+_h+'"></iframe>')
+
+  
+  });
+
+  </script>
+
+
 </html>
