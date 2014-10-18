@@ -65,6 +65,7 @@
 
     <script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
     <script src="./javascripts/html2canvas.js"></script>
+    <script src="./javascripts/md5-0.9.js"></script>
 
 
   <script>
@@ -82,16 +83,51 @@
         $('#gen-image').append(canvas);
         $('#convert').val('修改文字');
 
-        // save to image
+        // save to server
         var d = canvas.toDataURL("image/png");
-        console.log(d);
-        },
+        var imagename = 'images/generated/' + d.md5() + '.png';
+        var sha;
+
+        //check if exists
+
+  $.get('https://api.github.com/repos/yiannischang/text-to-image/contents/' + imagename, function (data) {
+        load_share('https://raw.githubusercontent.com/yiannischang/text-to-image/gh-pages/' + imagename);
+    })
+
+  // not exists
+  .fail(
+        function() {
+        $.ajax({
+          headers: {
+            Accept: 'application/vnd.github.v3.raw'
+          },
+          url: 'https://api.github.com/repos/yiannischang/text-to-image/contents/' + imagename + '?access_token=af1031d33c75febd29c2244fbabefbcfc2965a7a',
+          type: 'PUT',
+          contentType:'application/vnd.github.v3.raw',
+          data: JSON.stringify( {
+            "message": "generate image",
+            "committer": {
+              "name": "anonymous",
+              "email": "a@a.com"
+            },
+            "content": d.substring('data:image/png;base64,'.length)
+            //"sha": ''
+          }),
+          success: function (data) {
+            //成功则返回github上面的图片url，并加载分享图标
+            load_share('https://raw.githubusercontent.com/yiannischang/text-to-image/gh-pages/' + imagename);
+            console.log('ok');
+          }
+        });
+     });
+
+   },
       //width: 300,
       //height: 300
     });
    }
     else{
-
+        $('#share-wb').empty();
         $('#gen-image').empty();
         $('#w').show();
         $('#convert').val('生成图片');
@@ -99,7 +135,7 @@
     }
   }
 
-  $( function  (){
+  function load_share(image_path) {
 
    var _w = 16 , _h = 16;
    var param = {
@@ -108,7 +144,7 @@ url:location.href,
     count:'', /**是否显示分享数，1显示(可选)*/
     appkey:'', /**您申请的应用appkey,显示分享来源(可选)*/
     title:'aa', /**分享的文字内容(可选，默认为所在页面的title)*/
-    pic: 'images/download.png',
+    pic: image_path,
     //pic: "{{ site.production_url }}" + "/assets/images/1.png", /**分享图片的路径(可选)  screencapture needed ?? maybe? */
     ralateUid:'2141239811', /**关联用户的UID，分享微博会@该用户(可选)  That's me: @reduci */
     language:'zh_cn', /**设置语言，zh_cn|zh_tw(可选)*/
@@ -118,10 +154,9 @@ url:location.href,
    for( var p in param ){
      temp.push(p + '=' + encodeURIComponent( param[p] || '' ) )
    }
-   $('#share-wb').append('<iframe allowTransparency="true" frameborder="0" scrolling="no" src="http://hits.sinajs.cn/A1/weiboshare.html?' + temp.join('&') + '" width="'+ _w+'" height="'+_h+'"></iframe>')
+   $('#share-wb').html('<iframe allowTransparency="true" frameborder="0" scrolling="no" src="http://hits.sinajs.cn/A1/weiboshare.html?' + temp.join('&') + '" width="'+ _w+'" height="'+_h+'"></iframe>')
 
-  
-  });
+  }
 
   </script>
 
