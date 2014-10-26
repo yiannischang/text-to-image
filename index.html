@@ -76,6 +76,7 @@
     if( $('#convert').val() === '生成图片'  ) {
     html2canvas($('#w').get(0), {
       allowTaint: true,  // cross domain images
+      useCORS: true,
       onrendered: function(canvas) {
         $('#w').hide();
         $('#gen-image').append(canvas);
