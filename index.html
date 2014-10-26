@@ -77,6 +77,7 @@
     html2canvas($('#w').get(0), {
       allowTaint: true,  // cross domain images
       useCORS: true,
+      logging: true,
       onrendered: function(canvas) {
         $('#w').hide();
         $('#gen-image').append(canvas);
