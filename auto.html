@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<div id="feed"></div>
+<!--iframe id='remote' src='http://www.t-classical.com/sharing/%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%BC%B7%E9%B1%92%E9%AD%9A%E4%BA%94%E9%87%8D%E5%A5%8F.html' width="100%" height="100%"  frameborder="0" sandbox='allow-top-navigation'></iframe-->
+<div id="canvas"></div>
+
+</body>
+    <script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+    <script src="./javascripts/html2canvas.js"></script>
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <script type="text/javascript">google.load("feeds", "1");</script>
+<script>
+
+  function feed() {
+    var feed = new google.feeds.Feed('http://www.t-classical.com/feed');
+feed.load(function (result) {
+
+        if (!result.error) {
+          var container = document.getElementById("feed");
+          for (var i = 0; i < result.feed.entries.length; i++) {
+            var entry = result.feed.entries[i];
+            var div = document.createElement("div");
+            div.appendChild(document.createTextNode(entry.title));
+            container.appendChild(div);
+          }
+        }
+
+});
+
+function fetchData(url, callback) {
+    var frame = document.createElement('iframe');
+    frame.onload = function() {
+        frame.onload = function() {
+            callback(frame.contentWindow);
+            frame.parentNode.removeChild(frame);
+        }
+        frame.src = 'about:blank';
+    }
+    frame.src = url;
+    document.body.appendChild(frame);
+}
+
+// using it
+
+fetchData('http://www.t-classical.com/sharing/%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%BC%B7%E9%B1%92%E9%AD%9A%E4%BA%94%E9%87%8D%E5%A5%8F.html', function(response) {
+   console.log('aa');
+    console.log(response);
+   console.log('bb');
+
+});
+
+/*
+  $.ajax({
+    type: 'GET',
+    url: 'http://www.t-classical.com/sharing/%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%BC%B7%E9%B1%92%E9%AD%9A%E4%BA%94%E9%87%8D%E5%A5%8F.html',
+    crossDomain: true,
+    headers: { 'Access-Control-Allow-Origin': '*' },
+    success: function(data) {
+      html2canvas( data, {
+        onrendered: function(canvas) {
+          $('#canvas').append(canvas);
+        }
+      });
+    }
+  });
+*/
+
+}
+
+$(function() {
+    feed();
+ });
+ 
+
+</script>
+</html>
