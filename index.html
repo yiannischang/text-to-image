@@ -164,10 +164,10 @@ function getimage() {
       render();
     } 
     else {
+      var got = 0; // number of images data received successful
       cross_images.each(function(idx) {
         var url = $(this).attr('src');
         var that = this;
-        var got = 0; // number of images data received successful
         console.log('cors: ' + url);
 
         $.getImageData({
