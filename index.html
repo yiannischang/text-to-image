@@ -164,24 +164,31 @@ function getimage() {
       render();
     } 
     else {
-      var got = 0; // number of images data received successful
+      var succeed = 0; // number of images data received successful
+      var failed  = 0; // number of images data received failed
       cross_images.each(function(idx) {
         var url = $(this).attr('src');
         var that = this;
         console.log('cors: ' + url);
 
         $.getImageData({
-          url: url,
-          //server: 'http://127.0.0.1:8080/',
-          server: 'http://iproxy.sinaapp.com',
-          success: function(image){ 
-            $(that).attr('src', image.src);
-            
-            got  = got + 1;
-            console.log('image(' + got + '/' + cross_images.length + ')' )
-            if( got == cross_images.length )
-              render();
-          }
+            url: url,
+            //server: 'http://127.0.0.1:8080/',
+            server: 'http://iproxy.sinaapp.com',
+            success: function(image){ 
+              $(that).attr('src', image.src);
+              
+              ++succeed;
+              console.log('images: ' + (succeed+failed) + '/' + cross_images.length + ' (failed: ' + failed + ')' )
+              if( succeed+failed == cross_images.length )
+                render();
+            },
+            error: function(xhr, text_status){
+              ++failed;
+              console.log('images: ' + (succeed+failed) + '/' + cross_images.length + ' (failed: ' + failed + ')' )
+              if( succeed+failed == cross_images.length )
+                render();
+            }
          });
        });
     }
