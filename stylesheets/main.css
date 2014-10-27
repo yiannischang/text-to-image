@@ -9,14 +9,15 @@
 	}
 	#canvas{
 		/*margin-top:0.5em;*/
-		width:480px;
 		overflow:visible
 	}
 	#actions{
 		margin-bottom:0.5em
 	}
 	#w{
-		width:398px;
+    display: inline-block;
+    width:auto;
+		min-width:620px;
 		min-height:200px;
 		padding:10px;
 		font-family:Georgia;
