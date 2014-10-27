@@ -175,7 +175,10 @@ function getimage() {
           server: 'http://iproxy.sinaapp.com',
           success: function(image){ 
             $(that).attr('src', image.src);
-            render();
+            
+            // last cross domain image got
+            if( idx == cross_images.length - 1 )
+              render();
           }
          });
        });
