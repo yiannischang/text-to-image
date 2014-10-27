@@ -95,7 +95,7 @@ function convertImgToBase64(url, callback, outputFormat){
 }
 
 function render() {
-
+  console.log('render');
  var elem = $('#w');
 
     html2canvas($('#w').get(0), {
@@ -167,6 +167,7 @@ function getimage() {
       cross_images.each(function(idx) {
         var url = $(this).attr('src');
         var that = this;
+        var got = 0; // number of images data received successful
         console.log('cors: ' + url);
 
         $.getImageData({
@@ -176,8 +177,9 @@ function getimage() {
           success: function(image){ 
             $(that).attr('src', image.src);
             
-            // last cross domain image got
-            if( idx == cross_images.length - 1 )
+            got  = got + 1;
+            console.log('image(' + got + '/' + cross_images.length + ')' )
+            if( got == cross_images.length )
               render();
           }
          });
