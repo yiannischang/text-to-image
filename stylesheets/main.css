@@ -47,7 +47,7 @@
 	#convert:hover{
 		background-color:#04628e
 	}
-	#unsupported{
+  #unsupported{
 		border:1px solid gray;
 		background-color:silver;
 		padding:5px
@@ -58,3 +58,8 @@
 	#output,#unsupported{
 		display:none
 	}
+  #wb-share {
+    display:none
+  }
+
+
