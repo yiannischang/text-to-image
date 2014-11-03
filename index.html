@@ -39,35 +39,37 @@
         </div>
 
         <input type="button" id="convert" value="生成图片" onclick="getimage();return false;">
+        <input type="button" id="insert_abc" value="插入曲谱" onclick="insert_abc();return false;">
         <div id='wb-share'>
           <wb:share-button appkey="3qtHsl" addition="simple" type="button" picture_search="false"></wb:share-button>
         </div>
 
         </section>
 
-        <!--hr>
+        <hr>
 
-        <textarea name="abc" id="abc" cols="80" rows="15">X: 1
-        T: Cooley's
-        M: 4/4
-        L: 1/8
-        R: reel
-        K: Emin
-        |:D2|EB{c}BA B2 EB|~B2 AB dBAG|FDAD BDAD|FDAD dAFD|
-        EBBA B2 EB|B2 AB defg|afe^c dBAF|DEFD E2:|
-        |:gf|eB B2 efge|eB B2 gedB|A2 FA DAFA|A2 FA defg|
-        eB B2 eBgB|eB B2 defg|afe^c dBAF|DEFD E2:|
-        </textarea>
+        <!--textarea name="abc" id="abc" cols="80" rows="15">
+X: 1
+T: Cooley's
+M: 4/4
+L: 1/8
+R: reel
+K: Emin
+|:D2|EB{c}BA B2 EB|~B2 AB dBAG|FDAD BDAD|FDAD dAFD|
+EBBA B2 EB|B2 AB defg|afe^c dBAF|DEFD E2:|
+|:gf|eB B2 efge|eB B2 gedB|A2 FA DAFA|A2 FA defg|
+eB B2 eBgB|eB B2 defg|afe^c dBAF|DEFD E2:|
+        </textarea-->
 
         <hr />
 
         <div id="midi"></div>
         <div id="warnings"></div>
         <div id="music"></div>
-        <div id="paper0"></div>
-        <div id="paper1"></div>
-        <div id="paper2"></div>
-        <div id="paper3"></div-->
+
+        <canvas id="music_svg" style="display:none"></canvas>
+
+        <input type="button" value="生成图片" onclick="save_svg();return false;">
 
         <hr>
         <section id="main_content">
@@ -93,19 +95,23 @@
     <script src="./javascripts/html2canvas.js"></script>
     <script src="./javascripts/jquery.getimagedata.min.js"></script>
     <script src="./javascripts/md5-0.9.js"></script>
-    <!--script src="./javascripts/abcjs_editor_1.10-min.js"></script-->
+    <script src="./javascripts/abcjs_editor_1.10-min.js"></script>
     <script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js" type="text/javascript" charset="utf-8"></script>
-
+    <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
+    <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/StackBlur.js"></script>
+    <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script>
 
   <script>
 
 
   console.log(location.href);
 
-  if(1/*TODO: 存在 pic 参数*/) {
-    
+  if(1/*TODO: 存在 pic 参数*/) { }
 
-  }
+
+  $(function() {
+      max_abcid = 0;
+  });
 
 
 /**
@@ -132,61 +138,86 @@ function convertImgToBase64(url, callback, outputFormat){
     img.src = url;
 }
 
+//在文本输入框里面个插入 <textarea> 标签
+function insert_abc() { 
+  var abcid = ++max_abcid;
+  console.log(abcid);
+  $('#w').append('<div id="abc-' + abcid + '" class="abc"><textarea id="score-' + abcid + '"></textarea><div id="paper-' + abcid + '"></div></div><br>');
+  // focus in
+  $('#score-'+abcid).focus();
+  abc_editor = new ABCJS.Editor("score-"+abcid, { paper_id: "paper-"+abcid, midi_id:"midi", warnings_id:"warnings" });
+}
+
+
 function render() {
-  console.log('render');
- var elem = $('#w');
+  console.log('start render');
+  var elem = $('#w');
 
-    html2canvas($('#w').get(0), {
-      allowTaint: true,  // cross domain images
-      useCORS: true,
-      logging: true,
-      onrendered: function(canvas) {
+  //将svg数据导入到canvas中，因为html2canvas不支持svg
+  $('.abc').each(function(index) {
+    canvg('music_svg', $('div', this).html());
 
-        // save to server
-        var d = canvas.toDataURL("image/png");
-        var imagename = 'images/generated/' + d.md5() + '.png';
-        var sha;
+    //将svg转成png数据，并添加到dom中
+    var canvas = $('#music_svg').get(0);
+    var img = canvas.toDataURL('image/png');
+    var imagename = 'images/generated/' + img.md5() + '.png';
+    var sha;
 
-        //check if exists
+    $(this).hide();
+    $(this).after('<img class="abc_img" src="' + img + '"></img>');
+  });
 
-        $.get('https://api.github.com/repos/yiannischang/text-to-image/contents/' + imagename, function (data) {
-              load_share('https://raw.githubusercontent.com/yiannischang/text-to-image/gh-pages/' + imagename);
-          })
+  //check svg
+  html2canvas(elem.get(0), {
+    allowTaint: true,  // cross domain images
+    useCORS: true,
+    logging: true,
+    onrendered: function(canvas) {
 
-        // not exists
-        .fail(
-              function() {
-              $.ajax({
-                headers: {
-                  Accept: 'application/vnd.github.v3.raw'
+      // save to server
+      var d = canvas.toDataURL("image/png");
+      var imagename = 'images/generated/' + d.md5() + '.png';
+      var sha;
+
+      //check if exists
+      $.get('https://api.github.com/repos/yiannischang/text-to-image/contents/' + imagename, function (data) {
+            load_share('https://raw.githubusercontent.com/yiannischang/text-to-image/gh-pages/' + imagename);
+        })
+
+      // not exists
+      .fail(
+            function() {
+            $.ajax({
+              headers: {
+                Accept: 'application/vnd.github.v3.raw'
+              },
+              url: 'https://api.github.com/repos/yiannischang/text-to-image/contents/' + imagename + '?access_token=af1031d33c75febd29c2244fbabefbcfc2965a7a',
+              type: 'PUT',
+              contentType:'application/vnd.github.v3.raw',
+              data: JSON.stringify( {
+                "message": "generated image from http://yiannischang.github.io/text-to-image/",
+                "committer": {
+                  "name": "anonymous",
+                  "email": "a@a.com"
                 },
-                url: 'https://api.github.com/repos/yiannischang/text-to-image/contents/' + imagename + '?access_token=af1031d33c75febd29c2244fbabefbcfc2965a7a',
-                type: 'PUT',
-                contentType:'application/vnd.github.v3.raw',
-                data: JSON.stringify( {
-                  "message": "generated image from http://yiannischang.github.io/text-to-image/",
-                  "committer": {
-                    "name": "anonymous",
-                    "email": "a@a.com"
-                  },
-                  "content": d.substring('data:image/png;base64,'.length)
-                  //"sha": ''
-                }),
-                success: function (data) {
-                  //成功则返回github上面的图片url，并加载分享图标
-                  load_share('https://raw.githubusercontent.com/yiannischang/text-to-image/gh-pages/' + imagename);
-                  console.log('ok');
-                }
-              });
-           });
+                "content": d.substring('data:image/png;base64,'.length)
+                //"sha": ''
+              }),
+              success: function (data) {
+                //成功则返回github上面的图片url，并加载分享图标
+                load_share('https://raw.githubusercontent.com/yiannischang/text-to-image/gh-pages/' + imagename);
+                console.log('ok');
+              }
+            });
+         });
 
-        $('#w').hide();
-        $('#gen-image').append(canvas);
-        $('#convert').prop('disable', false).val('修改文字');
-       },
-      //width: 300,
-      //height: 300
-    });
+      $('#w').hide();
+      $('#gen-image').append(canvas);
+      $('#convert').prop('disable', false).val('修改文字');
+     },
+    //width: 300,
+    //height: 300
+  });
 }
 
 
@@ -194,9 +225,11 @@ function getimage() {
 
   if( $('#convert').val() === '生成图片'  ) {
     console.log('gen image');
-       $('#convert').prop('disable', true);
+    $('#convert').prop('disable', true);
+
+    //check cross domain
     var cross_images = $('img').filter(function (idx) {
-        return $(this).attr('src').substr(0, 4) === 'http'; // cross domain
+        return $(this).attr('src').substr(0, 4) === 'http'; 
      });
 
     if( cross_images.length == 0 ) {
@@ -237,6 +270,8 @@ function getimage() {
     console.log('edit');
     $('#wb-share').hide();
     $('#gen-image').empty();
+    $('.abc_img').remove();
+    $('.abc').show();
     $('#w').show();
     $('#convert').val('生成图片');
   }
